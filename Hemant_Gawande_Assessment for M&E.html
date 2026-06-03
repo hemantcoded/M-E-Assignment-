@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hemant Gawande | ME Manager Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d1117;
+    --paper: #f5f0e8;
+    --gold: #c9933a;
+    --gold-light: #e8b86d;
+    --teal: #1a6b6b;
+    --teal-light: #2a9d8f;
+    --rust: #b5451b;
+    --muted: #6b6560;
+    --border: rgba(201,147,58,0.25);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--ink);
+    color: var(--paper);
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; opacity: 0.4;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 60px 24px;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,147,58,0.12) 0%, transparent 70%),
+                radial-gradient(ellipse 40% 40% at 80% 80%, rgba(26,107,107,0.15) 0%, transparent 60%),
+                radial-gradient(ellipse 30% 30% at 20% 70%, rgba(181,69,27,0.1) 0%, transparent 60%);
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(201,147,58,0.06) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(201,147,58,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridShift 20s linear infinite;
+  }
+  @keyframes gridShift { from { transform: translate(0,0); } to { transform: translate(60px, 60px); } }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--gold); border: 1px solid var(--border);
+    padding: 6px 16px; border-radius: 20px;
+    margin-bottom: 32px;
+    opacity: 0; animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 900; line-height: 0.95;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #f5f0e8 0%, var(--gold-light) 40%, #f5f0e8 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    opacity: 0; animation: fadeUp 0.8s 0.4s forwards;
+  }
+
+  .hero-subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(14px, 2vw, 18px); font-weight: 300;
+    color: var(--muted); letter-spacing: 1px;
+    margin-top: 16px;
+    opacity: 0; animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-meta {
+    display: flex; gap: 32px; justify-content: center; flex-wrap: wrap;
+    margin-top: 48px;
+    opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .meta-pill {
+    font-family: 'Space Mono', monospace; font-size: 12px;
+    background: rgba(201,147,58,0.1); border: 1px solid var(--border);
+    padding: 8px 20px; border-radius: 4px; color: var(--gold-light);
+  }
+
+  .scroll-cue {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeUp 1s 1.5s forwards;
+  }
+  .scroll-cue span { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+  .scroll-line { width: 1px; height: 48px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+  @keyframes scrollPulse { 0%,100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+  /* ── NAV ── */
+  .sticky-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(13,17,23,0.9); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    transform: translateY(-100%); transition: transform 0.4s ease;
+  }
+  .sticky-nav.visible { transform: translateY(0); }
+  .nav-brand { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); }
+  .nav-links { display: flex; gap: 24px; }
+  .nav-links a {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 1px;
+    text-decoration: none; color: var(--muted); text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold-light); }
+
+  /* ── MAIN CONTAINER ── */
+  main { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 80px 24px; }
+
+  /* ── SECTION HEADINGS ── */
+  .q-block {
+    margin-bottom: 80px;
+    opacity: 0; transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .q-block.visible { opacity: 1; transform: none; }
+
+  .q-label {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--gold);
+    display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .q-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .q-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(24px, 4vw, 36px); font-weight: 700;
+    line-height: 1.2; margin-bottom: 32px;
+    color: var(--paper);
+  }
+
+  /* ── CARDS ── */
+  .card {
+    background: rgba(245,240,232,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px; padding: 32px;
+    position: relative; overflow: hidden;
+  }
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .card:hover::before { opacity: 1; }
+
+  .card p { line-height: 1.8; color: rgba(245,240,232,0.8); margin-bottom: 16px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ── GRID CARDS ── */
+  .issues-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .issue-card {
+    background: rgba(245,240,232,0.03); border: 1px solid var(--border);
+    border-radius: 10px; padding: 24px;
+    transition: transform 0.3s, background 0.3s;
+    position: relative;
+  }
+  .issue-card:hover { transform: translateY(-4px); background: rgba(201,147,58,0.06); }
+  .issue-num {
+    font-family: 'Space Mono', monospace; font-size: 32px; font-weight: 700;
+    color: rgba(201,147,58,0.15); line-height: 1;
+    margin-bottom: 12px;
+  }
+  .issue-card h3 { font-size: 15px; font-weight: 600; color: var(--gold-light); margin-bottom: 8px; }
+  .issue-card p { font-size: 13px; line-height: 1.6; color: rgba(245,240,232,0.6); }
+  .issue-impact {
+    margin-top: 12px; font-size: 12px; font-family: 'Space Mono', monospace;
+    color: var(--rust); background: rgba(181,69,27,0.1);
+    border: 1px solid rgba(181,69,27,0.2); border-radius: 4px; padding: 6px 10px;
+  }
+
+  /* ── STORY SECTION ── */
+  .story-card {
+    background: linear-gradient(135deg, rgba(26,107,107,0.15), rgba(42,157,143,0.05));
+    border: 1px solid rgba(42,157,143,0.25);
+    border-radius: 16px; padding: 48px;
+    position: relative; overflow: hidden;
+  }
+  .story-card::after {
+    content: '"'; position: absolute; top: -20px; right: 32px;
+    font-family: 'Playfair Display', serif; font-size: 200px; line-height: 1;
+    color: rgba(42,157,143,0.1); pointer-events: none;
+  }
+  .story-byline {
+    font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--teal-light);
+    margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
+  }
+  .story-byline::before { content: '◆'; }
+  .story-card p { font-size: 16px; line-height: 1.9; color: rgba(245,240,232,0.85); margin-bottom: 16px; }
+  .story-highlight {
+    background: rgba(42,157,143,0.15); border-left: 3px solid var(--teal-light);
+    padding: 16px 20px; border-radius: 0 8px 8px 0; margin: 20px 0;
+    font-weight: 600; font-size: 15px; color: var(--paper);
+  }
+
+  /* ── DONOR REPORT ── */
+  .donor-components { display: flex; flex-direction: column; gap: 12px; }
+  .donor-item {
+    display: flex; align-items: flex-start; gap: 20px;
+    background: rgba(245,240,232,0.02); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px;
+    transition: background 0.3s, transform 0.3s;
+    counter-increment: donor;
+  }
+  .donor-item:hover { background: rgba(201,147,58,0.05); transform: translateX(4px); }
+  .donor-num {
+    font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700;
+    color: rgba(201,147,58,0.3); min-width: 40px; line-height: 1;
+  }
+  .donor-title { font-size: 15px; font-weight: 600; color: var(--gold-light); margin-bottom: 6px; }
+  .donor-desc { font-size: 13px; line-height: 1.7; color: rgba(245,240,232,0.65); }
+
+  /* ── DASHBOARD TABLE ── */
+  .dash-table { width: 100%; border-collapse: collapse; }
+  .dash-table th {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--gold); text-align: left;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .dash-table td {
+    padding: 14px 16px; font-size: 13px; line-height: 1.6;
+    color: rgba(245,240,232,0.75); border-bottom: 1px solid rgba(201,147,58,0.08);
+    vertical-align: top;
+  }
+  .dash-table tr:hover td { background: rgba(201,147,58,0.04); }
+  .dash-table td:first-child { color: var(--paper); font-weight: 500; }
+
+  .tools-stack { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .tool-badge {
+    font-family: 'Space Mono', monospace; font-size: 11px;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid var(--border); color: var(--gold-light);
+    background: rgba(201,147,58,0.08);
+  }
+
+  /* ── Q4 TWO-COL ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
+  .col-card {
+    background: rgba(245,240,232,0.03); border: 1px solid var(--border);
+    border-radius: 12px; padding: 28px;
+  }
+  .col-card h3 { font-size: 14px; font-weight: 600; color: var(--gold-light); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; }
+  .col-card p { font-size: 13px; line-height: 1.8; color: rgba(245,240,232,0.7); }
+
+  /* ── RFP DOCS TABLE ── */
+  .rfp-docs { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+  .rfp-doc {
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 20px; align-items: start;
+    background: rgba(245,240,232,0.02); border: 1px solid var(--border);
+    border-radius: 10px; padding: 20px 24px;
+  }
+  .rfp-num {
+    font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900;
+    color: rgba(201,147,58,0.2); line-height: 1; min-width: 32px;
+  }
+  .rfp-name { font-size: 14px; font-weight: 600; color: var(--paper); margin-bottom: 6px; }
+  .rfp-why { font-size: 12px; line-height: 1.7; color: rgba(245,240,232,0.6); }
+  .rfp-tag {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 1px;
+    color: var(--teal-light); background: rgba(42,157,143,0.1);
+    border: 1px solid rgba(42,157,143,0.2); border-radius: 4px; padding: 4px 10px;
+    white-space: nowrap; height: fit-content;
+  }
+
+  /* ── MARATHI SECTION ── */
+  .marathi-card {
+    background: rgba(181,69,27,0.06); border: 1px solid rgba(181,69,27,0.2);
+    border-radius: 10px; padding: 24px; margin-top: 20px;
+  }
+  .marathi-label {
+    font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px;
+    color: #e07a5f; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .marathi-card p { font-size: 14px; line-height: 1.9; color: rgba(245,240,232,0.7); }
+
+  /* ── EVIDENCE CALLOUT ── */
+  .evidence-box {
+    background: rgba(201,147,58,0.08); border: 1px solid rgba(201,147,58,0.3);
+    border-radius: 8px; padding: 20px 24px; margin-top: 24px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .ev-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .ev-text { font-size: 13px; line-height: 1.7; color: rgba(245,240,232,0.75); }
+  .ev-text strong { color: var(--gold-light); }
+
+  /* ── FOOTER ── */
+  footer {
+    border-top: 1px solid var(--border); padding: 48px 24px;
+    text-align: center; position: relative; z-index: 1;
+  }
+  .footer-name { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--gold); margin-bottom: 8px; }
+  .footer-role { font-family: 'Space Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+  .footer-line { width: 40px; height: 2px; background: var(--gold); margin: 20px auto; }
+  .footer-note { font-size: 13px; color: rgba(245,240,232,0.3); }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HIGHLIGHT TAGS ── */
+  .highlight { color: var(--gold-light); font-weight: 600; }
+  .teal { color: var(--teal-light); }
+
+  /* ── PROGRESS BARS ── */
+  .prog-row { margin-bottom: 12px; }
+  .prog-label { display: flex; justify-content: space-between; font-size: 12px; color: rgba(245,240,232,0.6); margin-bottom: 6px; }
+  .prog-track { height: 4px; background: rgba(245,240,232,0.07); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--gold), var(--gold-light)); width: 0; transition: width 1.2s ease; }
+
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .rfp-doc { grid-template-columns: auto 1fr; }
+    .rfp-tag { display: none; }
+    .hero-meta { gap: 12px; }
+    .story-card { padding: 28px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- STICKY NAV -->
+<nav class="sticky-nav" id="nav">
+  <div class="nav-brand">H. Gawande</div>
+  <div class="nav-links">
+    <a href="#q1">Data Quality</a>
+    <a href="#q2">Impact Story</a>
+    <a href="#q3">Donor Reports</a>
+    <a href="#q4">Documentation</a>
+    <a href="#q5">Dashboard</a>
+    <a href="#q6">RFP</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-tag">Candidate Assessment · Round 2 · Written Test</div>
+  <h1>Hemant<br>Gawande</h1>
+  <p class="hero-subtitle">Monitoring, Evaluation &amp; Documentation Manager · Claidroid</p>
+  <div class="hero-meta">
+    <div class="meta-pill">M&amp;E · Data Quality</div>
+    <div class="meta-pill">Reporting · Programme Mgmt</div>
+    <div class="meta-pill">6 Questions · Full Assessment</div>
+  </div>
+  <div class="scroll-cue">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<main>
+
+  <!-- Q1 -->
+  <div class="q-block" id="q1">
+    <div class="q-label">Question 01</div>
+    <h2 class="q-title">Data Quality in Government Programmes</h2>
+
+    <div class="card" style="margin-bottom:20px;">
+      <p>Data quality is the <span class="highlight">backbone of any effective Government or CSR programme</span>. Without accurate, timely, and complete data, even the best-funded initiatives can fail to achieve their intended outcomes — wasting resources, missing beneficiaries, and eroding public trust.</p>
+      <p>High-quality data enables evidence-based decision-making, accountability &amp; transparency, accurate impact measurement, and early corrective action before damage compounds.</p>
+
+      <div class="evidence-box">
+        <div class="ev-icon">📊</div>
+        <div class="ev-text"><strong>Evidence:</strong> NITI Aayog's 2022 report on SDG India Index highlighted that several states reported inflated beneficiary numbers under welfare schemes due to poor MIS data governance, leading to misallocation of <strong>₹3,000+ crore</strong>. This underscores why data quality is not a back-office concern — it is a frontline governance imperative.</div>
+      </div>
+    </div>
+
+    <div class="marathi-card">
+      <div class="marathi-label">मराठी — Bilingual Response</div>
+      <p>शासकीय योजनांमध्ये डेटा गुणवत्ता अत्यंत महत्त्वाची भूमिका बजावते. महाराष्ट्रातील MIS प्रणालींमध्ये डुप्लिकेट लाभार्थी नोंदी आढळल्याने शेतकरी सन्मान निधी सारख्या योजनांमध्ये अनुदानाचे चुकीचे वाटप झाले. उच्च दर्जाच्या डेटामुळे — पुरावे-आधारित निर्णय घेणे, जबाबदारी निश्चित करणे आणि योजनांचे खरे परिणाम मोजणे — शक्य होते.</p>
+    </div>
+
+    <h3 style="font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin:32px 0 16px;font-family:'Space Mono',monospace;">Four Common Data Quality Issues</h3>
+    <div class="issues-grid">
+      <div class="issue-card">
+        <div class="issue-num">01</div>
+        <h3>Duplicate Entries</h3>
+        <p>Same beneficiary registered multiple times across MIS portals or Excel sheets.</p>
+        <div class="issue-impact">⚠ Inflated counts; fund misuse</div>
+      </div>
+      <div class="issue-card">
+        <div class="issue-num">02</div>
+        <h3>Incomplete Records</h3>
+        <p>Missing Aadhaar linkages, absent baseline data, or blank outcome indicators.</p>
+        <div class="issue-impact">⚠ Cannot track progress or verify eligibility</div>
+      </div>
+      <div class="issue-card">
+        <div class="issue-num">03</div>
+        <h3>Data Entry Errors</h3>
+        <p>Manual mistakes — wrong dates, transposed digits, incorrect village codes.</p>
+        <div class="issue-impact">⚠ Wrong targeting; false reporting</div>
+      </div>
+      <div class="issue-card">
+        <div class="issue-num">04</div>
+        <h3>Timeliness / Lag</h3>
+        <p>Data reported months after collection, making real-time monitoring impossible.</p>
+        <div class="issue-impact">⚠ Delayed action; loss of programme momentum</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-block" id="q2">
+    <div class="q-label">Question 02</div>
+    <h2 class="q-title">Impact Story — Digital Skills &amp; Financial Independence</h2>
+
+    <div class="story-card">
+      <div class="story-byline">PMGDISHA-type Digital Skills Programme · ~230 words</div>
+      <h3 style="font-family:'Playfair Display',serif;font-size:22px;color:var(--paper);margin-bottom:24px;line-height:1.3;">"From Data to Destiny: Kavya's Journey to Financial Freedom"</h3>
+
+      <p>Kavya Shinde, 22, grew up in Dhulgaon — a semi-arid village in Osmanabad district, Maharashtra, where drought and seasonal migration had long shattered young aspirations. With her father's farm earning less than ₹50,000 a year and no college within 30 kilometres, Kavya's world seemed bounded by geography and circumstance.</p>
+
+      <p>Socio-economic challenges were stacked against her: a patriarchal household that questioned the value of a woman's education beyond matriculation, erratic electricity, and zero exposure to digital devices.</p>
+
+      <div class="story-highlight">A turning point arrived when the local Panchayat, under PMGDISHA, identified Kavya for a 20-day digital literacy training — covering online communication, internet safety, digital payments, and freelancing fundamentals.</div>
+
+      <p>Within three months, Kavya had registered on Meesho and a content writing platform, earning <strong style="color:var(--teal-light)">₹8,000–₹12,000 per month</strong> — surpassing her father's agricultural income. She began training four other women in her village, catalysing a micro-network of digital earners.</p>
+
+      <p style="color:var(--paper);font-weight:500;">Today, Kavya is not just financially independent; she is proof that targeted government intervention, when delivered with quality and continuity, can convert socio-economic disadvantage into enduring community capital. <em>Her story is not an exception — it is a model.</em></p>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-block" id="q3">
+    <div class="q-label">Question 03</div>
+    <h2 class="q-title">Key Elements of a Good Donor Report</h2>
+
+    <div class="card" style="margin-bottom:24px;">
+      <p>A donor report is the organisation's most critical accountability instrument. A well-crafted report builds trust, demonstrates impact, and secures future funding. The following <span class="highlight">six components are non-negotiable</span>:</p>
+    </div>
+
+    <div class="donor-components">
+      <div class="donor-item">
+        <div class="donor-num">01</div>
+        <div>
+          <div class="donor-title">Executive Summary</div>
+          <div class="donor-desc">A concise 200-word overview of programme goals, key achievements, challenges, and financial highlights. This is the first thing donors read — it must be compelling and data-backed.</div>
+        </div>
+      </div>
+      <div class="donor-item">
+        <div class="donor-num">02</div>
+        <div>
+          <div class="donor-title">Programme Narrative &amp; Activities</div>
+          <div class="donor-desc">A detailed description of activities conducted, milestones reached, and timelines adhered to. Should reference the original work plan and note any deviations with justification.</div>
+        </div>
+      </div>
+      <div class="donor-item">
+        <div class="donor-num">03</div>
+        <div>
+          <div class="donor-title">Quantitative Outputs &amp; Outcomes</div>
+          <div class="donor-desc">Data-driven evidence of results: beneficiaries reached, training hours delivered, jobs created, income changes, etc. Disaggregated by gender, geography, and age wherever applicable.</div>
+        </div>
+      </div>
+      <div class="donor-item">
+        <div class="donor-num">04</div>
+        <div>
+          <div class="donor-title">Case Studies / Human Stories</div>
+          <div class="donor-desc">At least 1–2 impact stories that make data emotionally resonant. Stories bridge numbers and lived reality, making the report memorable to donors and board members alike.</div>
+        </div>
+      </div>
+      <div class="donor-item">
+        <div class="donor-num">05</div>
+        <div>
+          <div class="donor-title">Financial Utilisation Statement</div>
+          <div class="donor-desc">A clear, auditor-verified breakdown of funds spent vs budgeted. Must include variance explanations. Donors need to see that every rupee was accounted for transparently.</div>
+        </div>
+      </div>
+      <div class="donor-item">
+        <div class="donor-num">06</div>
+        <div>
+          <div class="donor-title">Challenges, Learnings &amp; Way Forward</div>
+          <div class="donor-desc">An honest reflection on bottlenecks faced, adaptive measures taken, and plans for the next phase. This demonstrates organisational maturity and credibility.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-block" id="q4">
+    <div class="q-label">Question 04</div>
+    <h2 class="q-title">How Documentation Supports Programme Improvement &amp; Stakeholder Communication</h2>
+
+    <div class="card" style="margin-bottom:24px;">
+      <p>Documentation is the <span class="highlight">institutional memory of any programme</span>. It transforms ephemeral activities into traceable, analysable records that drive both learning and accountability.</p>
+    </div>
+
+    <div class="two-col">
+      <div class="col-card">
+        <h3>Programme Improvement</h3>
+        <p>Systematic documentation — through field notes, progress reports, case studies, and MIS data — creates a continuous evidence trail. Programme managers can compare intended versus actual outputs, identify implementation gaps, and design evidence-based course corrections.</p>
+        <p style="margin-top:12px;font-size:12px;color:var(--gold-light);font-style:italic;">Example: If attendance data reveals a consistent drop-off in week three, this triggers investigation and programmatic redesign. Without documentation, such patterns remain invisible.</p>
+      </div>
+      <div class="col-card">
+        <h3>Stakeholder Communication</h3>
+        <p>Well-maintained documentation enables organisations to communicate with clarity and credibility across diverse audiences. For government partners, it demonstrates compliance. For donors, it validates fund utilisation. For communities, it builds trust by showing their participation is being recorded and valued.</p>
+        <p style="margin-top:12px;font-size:12px;color:var(--teal-light);font-style:italic;">Structured monthly reports, dashboards, and annual reviews ensure all stakeholders share a common factual understanding — removing ambiguity and building long-term partnerships.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-block" id="q5">
+    <div class="q-label">Question 05</div>
+    <h2 class="q-title">Designing a Programme Tracking Dashboard for Leadership</h2>
+
+    <div class="card" style="margin-bottom:24px;">
+      <p>An effective leadership dashboard translates field-level complexity into strategic clarity. It must answer three core leadership questions: <span class="highlight">Are we on track? Where are the gaps? What action is needed?</span></p>
+    </div>
+
+    <div style="overflow-x:auto;border:1px solid var(--border);border-radius:12px;margin-bottom:24px;">
+      <table class="dash-table">
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th>Details</th>
+            <th>Frequency</th>
+            <th>Decision Utility</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Key Metrics</td>
+            <td>Beneficiaries enrolled vs target; Training completion rate; Post-programme employment/income data; Budget utilisation %; Dropout/attrition rate</td>
+            <td>Weekly / Monthly</td>
+            <td>Flags underperformance; triggers field inquiry</td>
+          </tr>
+          <tr>
+            <td>Visuals / Charts</td>
+            <td>Progress bar (targets vs actuals); Geographic heat map; Monthly trend line; Pie chart for fund utilisation; Red-Amber-Green (RAG) status indicators</td>
+            <td>Monthly; reviewed quarterly</td>
+            <td>Enables quick visual scanning; supports board presentations</td>
+          </tr>
+          <tr>
+            <td>Segmentation</td>
+            <td>By geography (district/block/village); by gender; by programme component</td>
+            <td>Monthly</td>
+            <td>Reveals equity gaps and regional disparities</td>
+          </tr>
+          <tr>
+            <td>Alerts / Flags</td>
+            <td>Auto-highlight when any metric falls below 70% of target; flag delayed reports from field staff</td>
+            <td>Real-time</td>
+            <td>Enables proactive, not reactive, management</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;font-family:'Space Mono',monospace;">Recommended Tool Stack</h3>
+    <div class="tools-stack">
+      <div class="tool-badge">Excel + Dynamic Charts</div>
+      <div class="tool-badge">Google / Looker Studio</div>
+      <div class="tool-badge">Power BI</div>
+      <div class="tool-badge">Tableau</div>
+    </div>
+    <p style="font-size:13px;color:rgba(245,240,232,0.5);margin-top:16px;">Dashboard reviewed in monthly leadership meetings with a standing agenda item: <em>'Dashboard Review &amp; Action Points'</em>.</p>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-block" id="q6">
+    <div class="q-label">Question 06</div>
+    <h2 class="q-title">M&amp;E &amp; Documentation in RFP Responses</h2>
+
+    <div class="card" style="margin-bottom:32px;">
+      <p style="font-size:15px;font-weight:500;color:var(--paper);margin-bottom:20px;">Part 1 — Programme Data &amp; Evidence for the Proposal</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:rgba(245,240,232,0.03);border:1px solid var(--border);border-radius:8px;padding:16px;">
+          <div style="font-size:12px;color:var(--gold);font-family:'Space Mono',monospace;margin-bottom:8px;">QUANTITATIVE</div>
+          <p style="font-size:13px;color:rgba(245,240,232,0.7);">Beneficiary reach (disaggregated by gender, age, geography), training completion rates, livelihood outcomes, year-on-year improvement trends.</p>
+        </div>
+        <div style="background:rgba(245,240,232,0.03);border:1px solid var(--border);border-radius:8px;padding:16px;">
+          <div style="font-size:12px;color:var(--teal-light);font-family:'Space Mono',monospace;margin-bottom:8px;">BASELINE VS ENDLINE</div>
+          <p style="font-size:13px;color:rgba(245,240,232,0.7);">Pre- and post-intervention data showing measurable change — e.g., 78% of trained beneficiaries reported 40% income increase within 6 months.</p>
+        </div>
+        <div style="background:rgba(245,240,232,0.03);border:1px solid var(--border);border-radius:8px;padding:16px;">
+          <div style="font-size:12px;color:#e07a5f;font-family:'Space Mono',monospace;margin-bottom:8px;">COST-EFFECTIVENESS</div>
+          <p style="font-size:13px;color:rgba(245,240,232,0.7);">Cost-per-beneficiary data, cost-per-outcome ratios, and comparisons with sector benchmarks to demonstrate efficiency.</p>
+        </div>
+        <div style="background:rgba(245,240,232,0.03);border:1px solid var(--border);border-radius:8px;padding:16px;">
+          <div style="font-size:12px;color:rgba(245,240,232,0.4);font-family:'Space Mono',monospace;margin-bottom:8px;">THIRD-PARTY ASSESSMENTS</div>
+          <p style="font-size:13px;color:rgba(245,240,232,0.7);">Independent evaluations, audits, or reviews that validate self-reported data and add credibility.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:32px;">
+      <p style="font-size:15px;font-weight:500;color:var(--paper);margin-bottom:16px;">Part 2 — How M&amp;E Systems Strengthen RFP Chances</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-left:2px solid var(--gold);background:rgba(201,147,58,0.04);">
+          <span style="color:var(--gold);font-weight:700;min-width:20px;">→</span>
+          <div><strong style="font-size:13px;color:var(--gold-light);">Demonstrated Evidence Culture</strong><br><span style="font-size:13px;color:rgba(245,240,232,0.65);">Funders trust organisations that can prove, not just claim, impact through structured data collection and analysis.</span></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-left:2px solid var(--teal-light);background:rgba(42,157,143,0.04);">
+          <span style="color:var(--teal-light);font-weight:700;min-width:20px;">→</span>
+          <div><strong style="font-size:13px;color:var(--teal-light);">Risk Mitigation</strong><br><span style="font-size:13px;color:rgba(245,240,232,0.65);">A well-designed M&amp;E framework with early warning indicators shows the funder that the organisation can detect and correct problems before they escalate.</span></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-left:2px solid #e07a5f;background:rgba(181,69,27,0.04);">
+          <span style="color:#e07a5f;font-weight:700;min-width:20px;">→</span>
+          <div><strong style="font-size:13px;color:#e07a5f;">Scalability &amp; Replicability</strong><br><span style="font-size:13px;color:rgba(245,240,232,0.65);">Documented M&amp;E systems demonstrate that the programme model is process-driven — not person-dependent — making it fundable and scalable.</span></div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-left:2px solid rgba(245,240,232,0.3);background:rgba(245,240,232,0.02);">
+          <span style="color:rgba(245,240,232,0.5);font-weight:700;min-width:20px;">→</span>
+          <div><strong style="font-size:13px;color:rgba(245,240,232,0.8);">Compliance Readiness</strong><br><span style="font-size:13px;color:rgba(245,240,232,0.65);">Government RFPs require QPRs, Utilisation Certificates, and outcome data. Existing M&amp;E infrastructure signals Day-1 readiness.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;font-family:'Space Mono',monospace;">Part 3 — 3 Critical Documents for RFP Response</h3>
+    <div class="rfp-docs">
+      <div class="rfp-doc">
+        <div class="rfp-num">1</div>
+        <div>
+          <div class="rfp-name">Audited Financial Statements (last 3 years)</div>
+          <div class="rfp-why">Demonstrates financial stability, accountability, and capacity to manage the proposed grant responsibly. Most government/CSR RFPs mandate CA-audited accounts.</div>
+        </div>
+        <div class="rfp-tag">MANDATORY</div>
+      </div>
+      <div class="rfp-doc">
+        <div class="rfp-num">2</div>
+        <div>
+          <div class="rfp-name">Programme Performance Report / Impact Data</div>
+          <div class="rfp-why">Evidence of past programme outcomes comparable to RFP objectives. This is the organisation's 'proof of concept' — the single most persuasive element of any proposal.</div>
+        </div>
+        <div class="rfp-tag">CRITICAL</div>
+      </div>
+      <div class="rfp-doc">
+        <div class="rfp-num">3</div>
+        <div>
+          <div class="rfp-name">M&amp;E Framework / Theory of Change</div>
+          <div class="rfp-why">Demonstrates a clear logical pathway from inputs to outcomes. Funders want to see that the organisation understands not just what it will do, but how and why it will work — with measurable indicators at each stage.</div>
+        </div>
+        <div class="rfp-tag">ESSENTIAL</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">Hemant Gawande</div>
+  <div class="footer-role">ME &amp; Documentation Manager · Round 2 Assessment · Claidroid</div>
+  <div class="footer-line"></div>
+  <div class="footer-note">— End of Assessment —</div>
+</footer>
+
+<script>
+  // Sticky nav
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('visible', window.scrollY > window.innerHeight * 0.6);
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), 0);
+        // Animate progress bars if present
+        e.target.querySelectorAll('.prog-fill').forEach(bar => {
+          bar.style.width = bar.dataset.width;
+        });
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.q-block').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
